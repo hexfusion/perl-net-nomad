@@ -111,15 +111,15 @@ sub update {
     return $self;
 }
 
-=head2 force-leave
+=head2 force_leave
 
-    $nomad->server( node => 'client-ab2e23dc' )->force-leave
+    $nomad->server( node => 'client-ab2e23dc' )->force_leave
 
 =cut
 
-sub force-leave {
+sub force_leave {
     my $self = shift;
-    confess 'node required for ' . __PACKAGE__ . '->force-leave'
+    confess 'node required for ' . __PACKAGE__ . '->force_leave'
 	      unless $self->{node};
     $self->{endpoint} = '/agent/force-leave';
     $self->{method} = 'POST';
