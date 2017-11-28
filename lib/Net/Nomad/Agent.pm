@@ -86,4 +86,42 @@ sub server {
     );
 }
 
+=head2 self
+
+This endpoint queries the state of the target agent (self).
+
+    $nomad->agent()->self
+
+=cut
+
+sub self {
+    my $self = shift;
+    $self->{endpoint} = '/agent/self';
+    $self->{method} = 'POST';
+    $self->{required_acl} = 'agent:read';
+    $self->request;
+    return $self;
+}
+
+=head2 health
+
+This endpoint returns whether or not the agent is healthy. When using Consul
+it is the endpoint Nomad will register for its own health checks.
+
+When the agent is unhealthy 500 will be returned along with JSON response
+containing an error message.
+
+    $nomad->agent()->health
+
+=cut
+
+sub self {
+    my $self = shift;
+    $self->{endpoint} = '/agent/health';
+    $self->{method} = 'GET';
+    $self->{required_acl} = '';
+    $self->request;
+    return $self;
+}
+
 1;

@@ -100,9 +100,9 @@ sub join {
 
 =cut
 
-sub join {
+sub update {
     my $self = shift;
-    confess 'address required for ' . __PACKAGE__ . '->join'
+    confess 'address required for ' . __PACKAGE__ . '->update'
 	      unless $self->{address};
     $self->{endpoint} = '/agent/servers';
     $self->{method} = 'POST';
