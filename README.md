@@ -16,7 +16,7 @@ Defaults to 127.0.0.1
 
 ## port
 
-Default 2379.
+Default 4646.
 
 ## name
 
@@ -40,15 +40,23 @@ defaults to /v1
 
 ## api\_path
 
-The full api path. Defaults to http://127.0.0.1:2379/v1
+The full api path. Defaults to http://127.0.0.1:4646/v1
 
 # PUBLIC METHODS
+
+## agent
+
+See [Net::Nomad::Agent](https://metacpan.org/pod/Net::Nomad::Agent)
+
+    # query self
+    $nomad->agent()->self;
+
+    # check agent health
+    $nomad->agent()->health;
 
 # AUTHOR
 
 Sam Batschelet (hexfusion)
-
-# CONTRIBUTORS
 
 # ACKNOWLEDGEMENTS
 

@@ -111,7 +111,7 @@ has api_version => (
 
 =head2 api_path
 
-The full api path. Defaults to http://127.0.0.1:2379/v1
+The full api path. Defaults to http://127.0.0.1:4646/v1
 
 =cut
 
