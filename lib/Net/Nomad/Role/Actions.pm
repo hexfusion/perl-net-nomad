@@ -1,5 +1,5 @@
 use utf8;
-package Net::Etcd::Role::Actions;
+package Net::Nomad::Role::Actions;
 
 use strict;
 use warnings;
@@ -19,15 +19,15 @@ use namespace::clean;
 
 =head1 NAME
 
-Net::Etcd::Role::Actions
+Net::Nomad::Role::Actions
 
 =cut
 
 our $VERSION = '0.017';
 
-has etcd => (
+has nomad => (
     is  => 'ro',
-    isa => InstanceOf ['Net::Etcd'],
+    isa => InstanceOf ['Net::Nomad'],
 );
 
 =head2 json_args
@@ -40,9 +40,9 @@ has json_args => ( is => 'lazy', );
 
 sub _build_json_args {
     my ($self) = @_;
-    my $args;
+    my $args = {};
     for my $key ( keys %{$self} ) {
-        unless ( $key =~ /(?:etcd|cb|cv|hold|json_args|endpoint)$/ ) {
+        unless ( $key =~ /(?:nomad|method|required_acl|cb|cv|hold|json_args|endpoint)$/ ) {
             $args->{$key} = $self->{$key};
         }
     }
@@ -93,11 +93,7 @@ has headers => (
 sub _build_headers {
     my ($self) = @_;
     my $headers;
-    my $token = $self->etcd->auth_token;
     $headers->{'Content-Type'} = 'application/json';
-    unless ( $self->endpoint =~ m/authenticate/ ) {
-        $headers->{'Authorization'} = $token if $token;
-    }
     return $headers;
 }
 
@@ -105,7 +101,7 @@ has tls_ctx => ( is  => 'lazy', );
 
 sub _build_tls_ctx {
     my ($self) = @_;
-    my $cacert = $self->etcd->cacert;
+    my $cacert = $self->nomad->cacert;
     if ($cacert) {
         my $tls =({
             verify  => 0,
@@ -130,17 +126,6 @@ has hold => ( is => 'ro' );
 
 has response => ( is => 'ro' );
 
-=head2 retry_auth
-
-When set will retry authentication request and update token
-
-=cut
-
-has retry_auth => (
-    is      => 'ro',
-    default => 0
-);
-
 =head2 request
 
 =cut
@@ -149,19 +134,14 @@ has request => ( is => 'lazy', );
 
 sub _build_request {
     my ($self) = @_;
-    if ($self->{retry_auth} > 1) {
-        confess "Error: Unable to authenticate, check your username and password";
-        $self->{retry_auth} = 0;
-        return;
-    }
     $self->init;
     my $cb = $self->cb;
     my $cv = $self->cv ? $self->cv : AE::cv;
     $cv->begin;
 
     http_request(
-        'POST',
-        $self->etcd->api_path . $self->{endpoint},
+        $self->method,
+        $self->nomad->api_path . $self->{endpoint},
         headers => $self->headers,
         body => $self->json_args,
         tls_ctx => $self->tls_ctx,
@@ -189,58 +169,7 @@ sub _build_request {
     $cv->recv;
     $self->clear_headers;
 
-    if ( defined $self->{retry_auth} && $self->{retry_auth} ) {
-        my $auth = $self->etcd->auth()->authenticate;
-        if ( $auth->{response}{success} ) {
-            $self->{retry_auth} = 0;
-            $self->request;
-        }
-    }
     return $self;
-}
-
-=head2 get_value
-
-returns single decoded value or the first.
-
-=cut
-
-sub get_value {
-    my ($self)   = @_;
-    my $response = $self->response;
-    my $content  = from_json( $response->{content} );
-    #print STDERR Dumper($content);
-    my $value = $content->{kvs}->[0]->{value};
-    $value or return;
-    return decode_base64($value);
-}
-
-=head2 all
-
-returns list containing for example:
-
-  {
-    'mod_revision' => '3',
-    'version' => '1',
-    'value' => 'bar',
-    'create_revision' => '3',
-    'key' => 'foo0'
-  }
-
-where key and value have been decoded for your pleasure.
-
-=cut
-
-sub all {
-    my ($self)   = @_;
-    my $response = $self->response;
-    my $content  = from_json( $response->{content} );
-    my $kvs      = $content->{kvs};
-    for my $row (@$kvs) {
-        $row->{value} = decode_base64( $row->{value} );
-        $row->{key}   = decode_base64( $row->{key} );
-    }
-    return $kvs;
 }
 
 =head2 is_success
@@ -282,7 +211,6 @@ sub check_hdr {
     my ($self, $status)   = @_;
     my $success = $status == 200 ? 1 : 0;
     $self->{response}{success} = $success;
-    $self->{retry_auth}++ if $status == 401;
     return;
 }
 
