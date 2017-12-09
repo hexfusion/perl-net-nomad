@@ -7,6 +7,7 @@ use warnings;
 
 use Moo;
 use Types::Standard qw(Str Int Bool HashRef);
+use Net::Nomad::Agent;
 
 use namespace::clean;
 
@@ -42,7 +43,7 @@ has host => (
 
 =head2 port
 
-Default 2379.
+Default 4646.
 
 =cut
 
@@ -124,11 +125,31 @@ sub _build_api_path {
 
 =head1 PUBLIC METHODS
 
+=head2 agent
+
+See L<Net::Nomad::Agent>
+
+    # query self
+    $nomad->agent()->self;
+
+    # check agent health
+    $nomad->agent()->health;
+
+=cut
+
+sub agent {
+    my ( $self, $options ) = @_;
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    return Net::Nomad::Agent->new(
+        nomad => $self,
+        cb   => $cb,
+        ( $options ? %$options : () ),
+    );
+}
+
 =head1 AUTHOR
 
 Sam Batschelet (hexfusion)
-
-=head1 CONTRIBUTORS
 
 =head1 ACKNOWLEDGEMENTS
 

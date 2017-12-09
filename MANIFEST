@@ -3,8 +3,10 @@ Makefile.PL
 MANIFEST
 MANIFEST.SKIP
 README
+README.md
 lib/Net/Nomad.pm
 lib/Net/Nomad/Agent.pm
+lib/Net/Nomad/Agent/Server.pm
 lib/Net/Nomad/Allocation.pm
 lib/Net/Nomad/Client.pm
 lib/Net/Nomad/Deployment.pm
@@ -15,8 +17,10 @@ lib/Net/Nomad/Node.pm
 lib/Net/Nomad/Operator.pm
 lib/Net/Nomad/Quota.pm
 lib/Net/Nomad/Region.pm
-t/Net-Nomad.t
+lib/Net/Nomad/Role/Actions.pm
+lib/Net/Nomad/Role/Base.pm
 t/manifest.t
 t/pod-coverage.t
 t/pod-spelling.t
 t/pod.t
+t/01-agent.t
