@@ -43,7 +43,7 @@ has host => (
 
 =head2 port
 
-Default 2379.
+Default 4646.
 
 =cut
 

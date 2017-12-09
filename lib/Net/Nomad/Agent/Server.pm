@@ -9,8 +9,8 @@ use Types::Standard qw(Str Int Bool HashRef ArrayRef);
 use Carp;
 use Data::Dumper;
 
-with 'Net::Etcd::Role::Base';
-with 'Net::Etcd::Role::Actions';
+with 'Net::Nomad::Role::Base';
+with 'Net::Nomad::Role::Actions';
 
 use namespace::clean;
 

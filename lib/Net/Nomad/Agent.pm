@@ -9,6 +9,8 @@ use Types::Standard qw(Str Int Bool HashRef ArrayRef);
 use Net::Nomad::Agent::Server;
 use Data::Dumper;
 
+with 'Net::Nomad::Role::Actions';
+
 use namespace::clean;
 
 =head1 NAME
@@ -97,7 +99,7 @@ This endpoint queries the state of the target agent (self).
 sub self {
     my $self = shift;
     $self->{endpoint} = '/agent/self';
-    $self->{method} = 'POST';
+    $self->{method} = 'GET';
     $self->{required_acl} = 'agent:read';
     $self->request;
     return $self;
@@ -115,7 +117,7 @@ containing an error message.
 
 =cut
 
-sub self {
+sub health {
     my $self = shift;
     $self->{endpoint} = '/agent/health';
     $self->{method} = 'GET';
