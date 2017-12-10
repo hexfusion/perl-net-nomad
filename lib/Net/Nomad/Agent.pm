@@ -9,6 +9,7 @@ use Types::Standard qw(Str Int Bool HashRef ArrayRef);
 use Net::Nomad::Agent::Server;
 use Data::Dumper;
 
+with 'Net::Nomad::Role::Base';
 with 'Net::Nomad::Role::Actions';
 
 use namespace::clean;
@@ -24,30 +25,6 @@ our $VERSION = '0.0.1';
 =head1 DESCRIPTION
 
 The /agent endpoints are used to interact with the local Nomad agent.
-
-=head1 ACCESSORS
-
-=head2 endpoint
-
-API endpoint
-
-=cut
-
-has endpoint => (
-    is      => 'rwp',
-    isa     => Str,
-);
-
-=head2 method
-
-HTTP method called against API
-
-=cut
-
-has method => (
-    is      => 'rwp',
-    isa     => Str,
-);
 
 =head1 PUBLIC METHODS
 

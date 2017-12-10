@@ -54,6 +54,13 @@ See [Net::Nomad::Agent](https://metacpan.org/pod/Net::Nomad::Agent)
     # check agent health
     $nomad->agent()->health;
 
+## allocation
+
+See [Net::Nomad::Allocation](https://metacpan.org/pod/Net::Nomad::Allocation)
+
+    $nomad->allocation({ prefix=> 'a8198d79' })->list;
+    $nomad->allocation( { alloc_id => '5456bd7a-9fc0-c0dd-6131-cbee77f57577' } )->read
+
 # AUTHOR
 
 Sam Batschelet (hexfusion)

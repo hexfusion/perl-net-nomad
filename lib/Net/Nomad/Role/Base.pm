@@ -51,4 +51,15 @@ has required_acl => (
     isa     => ArrayRef,
 );
 
+=head2 parameter_type
+
+=cut
+
+has param_type => (
+    is      => 'ro',
+    isa     => Str,
+);
+
+
+
 1;
