@@ -24,3 +24,4 @@ t/pod-coverage.t
 t/pod-spelling.t
 t/pod.t
 t/01-agent.t
+t/02-allocation.t

@@ -8,6 +8,7 @@ use warnings;
 use Moo;
 use Types::Standard qw(Str Int Bool HashRef);
 use Net::Nomad::Agent;
+use Net::Nomad::Allocation;
 
 use namespace::clean;
 
@@ -147,6 +148,24 @@ sub agent {
     );
 }
 
+=head2 allocation
+
+See L<Net::Nomad::Allocation>
+
+    $nomad->allocation({ prefix=> 'a8198d79' })->list;
+    $nomad->allocation( { alloc_id => '5456bd7a-9fc0-c0dd-6131-cbee77f57577' } )->read
+
+=cut
+
+sub allocation {
+    my ( $self, $options ) = @_;
+    my $cb = pop if ref $_[-1] eq 'CODE';
+    return Net::Nomad::Allocation->new(
+        nomad => $self,
+        cb   => $cb,
+        ( $options ? %$options : () ),
+    );
+}
 =head1 AUTHOR
 
 Sam Batschelet (hexfusion)

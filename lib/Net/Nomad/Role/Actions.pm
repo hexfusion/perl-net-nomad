@@ -23,7 +23,7 @@ Net::Nomad::Role::Actions
 
 =cut
 
-our $VERSION = '0.017';
+our $VERSION = '0.0.1';
 
 has nomad => (
     is  => 'ro',
@@ -36,17 +36,29 @@ arguments that will be sent to the api
 
 =cut
 
-has json_args => ( is => 'lazy', );
+has params => ( is => 'lazy', );
 
-sub _build_json_args {
+sub _build_params {
     my ($self) = @_;
-    my $args = {};
+    my $args;
+    my $params ='';
     for my $key ( keys %{$self} ) {
-        unless ( $key =~ /(?:nomad|method|required_acl|cb|cv|hold|json_args|endpoint)$/ ) {
+        unless ( $key =~ /(?:nomad|param_type|method|required_acl|cb|cv|hold|json_args|endpoint)$/ ) {
             $args->{$key} = $self->{$key};
         }
     }
-    return to_json($args);
+    my $type = $self->param_type;
+    return $params unless ($type && $args);
+    if ($type eq 'form') {
+        $params = '?' . join('&', map{ "$_=$args->{$_}" } keys %$args);
+        $params =~ s/^\s+|\s+$//g;
+        return $params;
+    }
+    # ignore multiple params when using route
+    if ((keys %$args) == 1 && $type eq 'route') {
+        return '/' . $args->{(keys %$args)[0]};
+    }
+    return $params;
 }
 
 =head2 cb
@@ -76,7 +88,7 @@ has cv => (
 
 sub init {
     my ($self)  = @_;
-    my $init = $self->json_args;
+    my $init = $self->params;
     $init or return;
     return $self;
 }
@@ -106,7 +118,7 @@ sub _build_tls_ctx {
         my $tls =({
             verify  => 0,
             ca_path => $cacert,
-		});
+        });
         return $tls;
     }
     return 'low'; #default
@@ -141,9 +153,9 @@ sub _build_request {
 
     http_request(
         $self->method,
-        $self->nomad->api_path . $self->{endpoint},
+        $self->nomad->api_path . $self->{endpoint} . $self->{params},
         headers => $self->headers,
-        body => $self->json_args,
+        body => '{}',
         tls_ctx => $self->tls_ctx,
         on_header => sub {
             my($headers) = @_;
@@ -168,7 +180,6 @@ sub _build_request {
     );
     $cv->recv;
     $self->clear_headers;
-
     return $self;
 }
 
